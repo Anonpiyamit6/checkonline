@@ -14,49 +14,64 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
     body { font-family: 'Prompt', sans-serif; }
     .pastel-bg { background: linear-gradient(135deg, #eef9f1 0%, #fdfbf1 50%, #e9f6ef 100%); }
 
-    /* สไตล์แบบฟอร์มราชการ (TH Sarabun) */
-    .gov-page {
-      font-family: 'Sarabun', 'TH Sarabun PSK', sans-serif !important;
-      color: #000;
-      line-height: 1.5;
-      background: #fff;
-    }
-    .gov-table {
-      width: 100%;
-      border-collapse: collapse;
-      table-layout: fixed; /* ล็อคขนาดคอลัมน์ไม่ให้เบียดกัน */
-    }
-    .gov-table th, .gov-table td {
-      border: 1px solid #000;
-      padding: 6px 4px;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-    }
+    /* ซ่อนพื้นที่พิมพ์ในหน้าเว็บปกติ */
+    #print-area { display: none; }
 
-    /* ซ่อนส่วนพิมพ์เมื่ออยู่บนหน้าเว็บปกติ */
-    @media screen {
-      #print-area { display: none; }
-    }
-    /* ตั้งค่าหน้ากระดาษ A4 เมื่อสั่งพิมพ์ */
+    /* ======================================================== */
+    /* การตั้งค่าหน้าพิมพ์ PDF แบบฟอร์มราชการ (A4 สารบรรณแท้)     */
+    /* ======================================================== */
     @media print {
-      body * { visibility: hidden; }
-      #print-area, #print-area * { visibility: visible; }
-      #print-area {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        display: block !important;
+      /* บังคับหน้ากระดาษขาว 100% ไม่มีสีฉากหลังหลุดเข้ามา */
+      html, body {
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
       }
+      
+      /* ซ่อนทุกชิ้นส่วนบนหน้าจอ ยกเว้นใบรายงานราชการ */
+      header, main, footer, #admin-modal, .swal2-container {
+        display: none !important;
+      }
+
+      #print-area {
+        display: block !important;
+        position: relative !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+      }
+
       @page {
         size: A4 portrait;
-        margin: 12mm 10mm;
+        margin: 15mm 12mm 15mm 12mm;
+      }
+
+      .gov-page {
+        font-family: 'Sarabun', 'TH Sarabun PSK', sans-serif !important;
+        color: #000 !important;
+        line-height: 1.45;
+      }
+
+      .gov-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+      }
+
+      .gov-table th, .gov-table td {
+        border: 1px solid #222 !important;
+        padding: 5px 6px;
+        word-break: break-word;
       }
     }
   </style>
@@ -253,7 +268,7 @@
           📗 โหลด Excel (.xlsx)
         </button>
 
-        <!-- พิมพ์ / บันทึก PDF (แบบคมชัดมาตรฐานราชการ) -->
+        <!-- พิมพ์ / บันทึก PDF (แบบฟอร์มราชการแท้) -->
         <button onclick="printGovernmentPDF()" 
                 class="bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 px-3 rounded-xl shadow-sm flex items-center justify-center gap-1.5 text-xs sm:text-sm">
           📕 พิมพ์ / บันทึก PDF
@@ -267,22 +282,24 @@
     </div>
   </div>
 
-  <!-- โครงสร้างสำหรับพิมพ์/ออกรายงาน PDF ตามระเบียบสารบรรณราชการ -->
-  <div id="print-area" class="gov-page p-8 max-w-[210mm] mx-auto text-black">
-    <div class="text-center mb-5">
+  <!-- ========================================================= -->
+  <!-- โครงสร้างเอกสารราชการ A4 แท้ (สำหรับการพิมพ์ / บันทึกเป็น PDF) -->
+  <!-- ========================================================= -->
+  <div id="print-area" class="gov-page">
+    <div style="text-align: center; margin-bottom: 20px;">
       <img src="https://s.imgz.io/2026/10/06/31ee5db68b3d5c54b65425b0af82e3e7348c032590932d02.png" 
-           style="width: 65px; height: 65px; margin: 0 auto 6px auto; object-fit: contain;">
+           style="width: 60px; height: 60px; margin: 0 auto 6px auto; object-fit: contain;">
       <h2 style="font-size: 16pt; font-weight: bold; margin: 0;">รายงานสรุปการลงเวลาปฏิบัติราชการและปฏิบัติงาน</h2>
-      <h3 style="font-size: 14pt; font-weight: bold; margin: 2px 0;">โรงเรียนบางสะพานวิทยา อำเภอบางสะพาน จังหวัดประจวบคีรีขันธ์</h3>
+      <h3 style="font-size: 14pt; font-weight: bold; margin: 3px 0;">โรงเรียนบางสะพานวิทยา อำเภอบางสะพาน จังหวัดประจวบคีรีขันธ์</h3>
       <p id="pdf-report-date" style="font-size: 13pt; margin: 4px 0;">ข้อมูล ณ วัน...</p>
     </div>
 
-    <table class="gov-table text-left" style="font-size: 11pt;">
+    <table class="gov-table" style="font-size: 11pt;">
       <thead>
-        <tr style="background-color: #f3f4f6; text-align: center; font-weight: bold;">
+        <tr style="background-color: #f2f2f2; text-align: center; font-weight: bold;">
           <th style="width: 7%; text-align: center;">ลำดับ</th>
-          <th style="width: 22%; text-align: center;">วันเวลาที่บันทึก</th>
-          <th style="width: 28%; text-align: left; padding-left: 8px;">ชื่อ - นามสกุล</th>
+          <th style="width: 21%; text-align: center;">วันเวลาที่บันทึก</th>
+          <th style="width: 29%; text-align: left; padding-left: 8px;">ชื่อ - นามสกุล</th>
           <th style="width: 23%; text-align: left; padding-left: 8px;">กลุ่มสาระ / ประเภท</th>
           <th style="width: 10%; text-align: center;">ช่วงเวลา</th>
           <th style="width: 10%; text-align: center;">สถานะ</th>
@@ -290,18 +307,26 @@
       </thead>
       <tbody id="pdf-table-body">
       </tbody>
+      <!-- แถวสรุปยอดรวมราชการ เพื่อปิดตารางให้สมบูรณ์ -->
+      <tfoot>
+        <tr style="font-weight: bold; background-color: #fafafa;">
+          <td colspan="4" style="text-align: right; padding-right: 12px;">รวมจำนวนผู้ลงชื่อปฏิบัติงานทั้งหมด</td>
+          <td id="pdf-summary-total" colspan="2" style="text-align: center;">0 คน</td>
+        </tr>
+      </tfoot>
     </table>
 
-    <div style="margin-top: 40px; display: flex; justify-content: space-between; font-size: 12pt; page-break-inside: avoid;">
+    <!-- ส่วนลงนามราชการ (แก้ปัญหาคำตกบรรทัด 100%) -->
+    <div style="margin-top: 45px; display: flex; justify-content: space-between; font-size: 13pt; page-break-inside: avoid;">
       <div style="text-align: center; width: 45%;">
-        <p>ลงชื่อ........................................................ผู้รายงาน</p>
-        <p style="margin-top: 4px;">(........................................................)</p>
-        <p>เจ้าหน้าที่กลุ่มงานบริหารงานบุคคล</p>
+        <p style="white-space: nowrap; margin: 0;">ลงชื่อ...................................................ผู้รายงาน</p>
+        <p style="margin: 8px 0 0 0;">(...................................................)</p>
+        <p style="margin: 4px 0 0 0; font-size: 12pt;">เจ้าหน้าที่กลุ่มงานบริหารงานบุคคล</p>
       </div>
       <div style="text-align: center; width: 45%;">
-        <p>ลงชื่อ........................................................ผู้รับรอง</p>
-        <p style="margin-top: 4px;">(........................................................)</p>
-        <p>ผู้อำนวยการโรงเรียนบางสะพานวิทยา</p>
+        <p style="white-space: nowrap; margin: 0;">ลงชื่อ...................................................ผู้รับรอง</p>
+        <p style="margin: 8px 0 0 0;">(...................................................)</p>
+        <p style="margin: 4px 0 0 0; font-size: 12pt;">ผู้อำนวยการโรงเรียนบางสะพานวิทยา</p>
       </div>
     </div>
   </div>
@@ -337,13 +362,10 @@
       return new Date(utc + (3600000 * 7));
     }
 
-    // จัดการแปลงวันเวลาให้เป็นรูปแบบไทยอ่านง่าย ไม่ล้นตาราง
     function formatDateTime(val) {
       if (!val) return '-';
       const d = new Date(val);
-      if (isNaN(d.getTime())) {
-        return String(val); // ถ้าเป็นข้อความเดิมอยู่แล้ว
-      }
+      if (isNaN(d.getTime())) return String(val);
       const day = String(d.getDate()).padStart(2, '0');
       const month = String(d.getMonth() + 1).padStart(2, '0');
       const year = d.getFullYear() + 543;
@@ -352,11 +374,8 @@
       return `${day}/${month}/${year} ${hours}:${minutes} น.`;
     }
 
-    // ระบบแยกแถวข้อมูลแบบอัจฉริยะ (รองรับทั้งชีตแบบเก่า 5 คอลัมน์ และแบบใหม่ 7 คอลัมน์)
     function parseRow(r) {
       if (!r || r.length === 0) return null;
-
-      // ถ้าเป็นแบบใหม่ 7 คอลัมน์: [วันเวลา, คำนำหน้า, ชื่อ, นามสกุล, กลุ่ม, ช่วงเวลา, สถานะ]
       if (r.length >= 7) {
         const prefix = r[1] || '';
         const fname = r[2] || '';
@@ -369,9 +388,7 @@
           period: r[5] || '-',
           status: r[6] || '-'
         };
-      } 
-      // ถ้าเป็นแบบเดิม 5 คอลัมน์: [วันเวลา, ชื่อเต็ม, กลุ่ม, ช่วงเวลา, สถานะ]
-      else {
+      } else {
         return {
           time: formatDateTime(r[0]),
           fullName: r[1] || '-',
@@ -424,7 +441,6 @@
       updateClock();
     }
 
-    // บันทึกฟอร์ม
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       if (saving) return;
@@ -498,9 +514,6 @@
       }
     });
 
-    // -----------------------------------------------------------
-    // ระบบผู้ดูแลระบบ (Admin Dashboard)
-    // -----------------------------------------------------------
     async function openAdminLogin() {
       const { value: password } = await Swal.fire({
         title: 'เข้าสู่ระบบผู้ดูแลระบบ',
@@ -569,7 +582,6 @@
       document.getElementById('stat-ontime').textContent = ontime;
       document.getElementById('stat-late').textContent = late;
 
-      // แสดง 20 แถวล่าสุด
       [...parsedRows].reverse().slice(0, 20).forEach(item => {
         const tr = document.createElement('tr');
         tr.className = 'hover:bg-slate-50 transition';
@@ -587,7 +599,6 @@
       document.getElementById('admin-modal').classList.add('hidden');
     }
 
-    // 1. ดาวน์โหลดไฟล์ Excel (.xlsx)
     function downloadExcelReport() {
       if (!fetchedAdminData || fetchedAdminData.length === 0) {
         Swal.fire('ไม่มีข้อมูล', 'ยังไม่มีรายการลงชื่อ', 'info');
@@ -600,7 +611,7 @@
       XLSX.writeFile(wb, `รายงานลงเวลา_บางสะพานวิทยา_${dateStr}.xlsx`);
     }
 
-    // 2. พิมพ์ / บันทึกเป็น PDF (แบบมาตรฐานราชการ คมชัด 100% ตัวอักษรไม่เบียด)
+    // ฟังก์ชันพิมพ์ / บันทึก PDF ฉบับแก้คำตกบรรทัดและตัดสีพื้นหลังทิ้ง
     function printGovernmentPDF() {
       if (!fetchedAdminData || fetchedAdminData.length <= 1) {
         Swal.fire('ไม่มีข้อมูล', 'ยังไม่มีรายการลงชื่อสำหรับออกรายงาน PDF', 'info');
@@ -614,9 +625,15 @@
       const pdfTbody = document.getElementById('pdf-table-body');
       pdfTbody.innerHTML = '';
 
+      let countOntime = 0;
+      let countLate = 0;
+
       rows.forEach((r, idx) => {
         const item = parseRow(r);
         if (!item) return;
+
+        if (item.status === 'ตรงเวลา') countOntime++;
+        if (item.status === 'สาย') countLate++;
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -630,8 +647,10 @@
         pdfTbody.appendChild(tr);
       });
 
-      // สั่งเปิดหน้าพิมพ์ระบบของเบราว์เซอร์ ซึ่งผู้ใช้สามารถกด "บันทึกเป็น PDF" ได้ทันที
-      // ฟอนต์จะคมชัดแบบ Vector และสระภาษาไทยจะไม่ทับกันเด็ดขาด
+      // สรุปยอดรวมท้ายตาราง
+      document.getElementById('pdf-summary-total').textContent = `${rows.length} คน (ตรงเวลา ${countOntime} คน, สาย ${countLate} คน)`;
+
+      // สั่งพิมพ์ทันที
       window.print();
     }
 
