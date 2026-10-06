@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="th">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบลงชื่อออนไลน์ | กลุ่มงานบริหารงานบุคคล</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --ink:#172b3d; --muted:#607080; --blue:#183e61; --cream:#f5f2eb; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:'Sarabun',sans-serif; color:var(--ink); }
+    .app-shell { width:100%; min-height:100%; background:radial-gradient(circle at 92% 0%,#e4eaf0 0%,transparent 38%),#f5f2eb; }
+    .rule-card { border:1px solid #e2e7e9; }
+    .form-card { box-shadow:0 22px 65px rgba(23,43,61,.10); }
+    input:focus-visible,button:focus-visible { outline:3px solid #e4ac55; outline-offset:3px; }
+    button:disabled { opacity:.55; cursor:not-allowed; }
+    .notice:empty { display:none; }
+    @media (prefers-reduced-motion:no-preference) {
+      .rise { animation:rise .55s both; }
+      .rise-later { animation-delay:.12s; }
+      @keyframes rise { from {opacity:0;transform:translateY(12px)} to {opacity:1;transform:translateY(0)} }
+    }
+  </style>
+  <script src="https://cdn.tailwindcss.com/3.4.17" type="text/javascript"></script>
+ </head>
+ <body class="app-shell">
+  <main class="w-full max-w-6xl mx-auto px-5 sm:px-8 py-8 sm:py-14">
+   <header class="rise mb-9 sm:mb-12">
+    <div class="flex items-center gap-3 mb-6"><span aria-hidden="true" class="w-11 h-11 rounded-xl bg-[#183e61] text-white grid place-items-center font-bold text-2xl">✓</span>
+     <p class="font-semibold tracking-wide">กลุ่มงานบริหารงานบุคคล</p>
+    </div>
+    <h1 class="font-bold leading-tight mb-3 text-3xl">ระบบลงชื่อปฏิบัติงานออนไลน์</h1>
+    <p class="max-w-2xl leading-relaxed text-[#607080]">กรุณากรอกข้อมูลให้ครบถ้วนเพื่อบันทึกเวลาปฏิบัติงานของท่าน ระบบจะทำการบันทึกเวลาตามเวลามาตรฐานประเทศไทย</p>
+   </header>
+   <div class="w-full max-w-2xl mx-auto">
+    <section class="rise rise-later form-card bg-white rounded-3xl p-6 sm:p-9" aria-labelledby="form-heading">
+     <div class="flex flex-wrap justify-between items-start gap-4 mb-7">
+      <div>
+       <p class="font-bold tracking-wide mb-1 text-[#607080]">แบบฟอร์มลงเวลา</p>
+       <h2 id="form-heading" class="font-bold text-xl">บันทึกเวลาปฏิบัติงาน</h2>
+      </div><span id="date-pill" class="rounded-full bg-[#eaf0f4] px-4 py-2 font-semibold text-sm"></span>
+     </div>
+     <div class="bg-[#183e61] rounded-2xl p-5 sm:p-6 mb-7">
+      <p class="mb-1 text-[#d9e6f0]">เวลาปัจจุบัน</p>
+      <p id="current-clock" class="font-bold text-white text-3xl sm:text-4xl tabular-nums" aria-live="off">--:--:--</p>
+      <p id="current-period" class="mt-2 text-[#d9e6f0] font-medium" aria-live="polite">กำลังตรวจสอบช่วงเวลา…</p>
+     </div>
+     <form id="attendance-form" novalidate>
+      <label for="full-name" class="block font-semibold mb-2">ชื่อ - นามสกุล</label> 
+      <input id="full-name" name="full_name" type="text" autocomplete="name" required maxlength="120" placeholder="เช่น นายสมชาย ใจดี" class="w-full rounded-xl border border-[#cbd5dc] bg-white px-4 py-3.5 mb-6 text-[#172b3d] placeholder:text-[#8996a1]">
+      
+      <label for="learning-group" class="block font-semibold mb-2">กลุ่มสาระการเรียนรู้ / ประเภทบุคลากร</label> 
+      <select id="learning-group" name="learning_group" required class="w-full rounded-xl border border-[#cbd5dc] bg-white px-4 py-3.5 mb-6 text-[#172b3d]"> 
+        <option value="" disabled selected>เลือกกลุ่ม...</option> 
+        <option>ผู้บริหาร</option>
+        <option>การงานอาชีพ</option>
+        <option>คณิตศาสตร์</option>
+        <option>ภาษาไทย</option>
+        <option>วิทยาศาสตร์และเทคโนโลยี</option>
+        <option>ศิลปะ</option>
+        <option>สังคมศึกษา</option>
+        <option>ภาษาต่างประเทศ</option>
+        <option>สุขศึกษาและพลศึกษา</option>
+        <option>แนะแนว</option>
+        <option>เจ้าหน้าที่</option>
+        <option>พนักงานราชการ</option>
+        <option>นักศึกษาฝึกสอน</option>
+        <option>อื่น ๆ</option> 
+      </select> 
+      
+      <button id="submit-button" type="submit" class="w-full rounded-xl bg-[#183e61] text-white px-5 py-4 font-bold transition hover:bg-[#28577c]"> 
+        <span id="submit-ready">ยืนยันการลงชื่อ</span> 
+        <span id="submit-loading" class="hidden">กำลังบันทึก…</span> 
+      </button>
+     </form>
+     <p id="feedback" class="notice mt-5 rounded-xl px-4 py-3 leading-relaxed" role="status" aria-live="polite"></p>
+    </section>
+   </div>
+  </main>
+  
+  <script>
+    // ----------------------------------------------------
+    // นำ URL ที่ได้จาก Google Apps Script มาใส่ในช่องแปรด้านล่างนี้
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbybkyLWApW9C6m8-W1Oj4_d9QWNhOqEU4mret-SiWpZAOX9hL8Gy4GKHAZxzDbhsaLtkw/exec';
+    // ----------------------------------------------------
+
+    const form = document.getElementById('attendance-form');
+    const nameInput = document.getElementById('full-name');
+    const groupSelect = document.getElementById('learning-group');
+    const submitButton = document.getElementById('submit-button');
+    const readyText = document.getElementById('submit-ready');
+    const loadingText = document.getElementById('submit-loading');
+    const feedback = document.getElementById('feedback');
+    const clock = document.getElementById('current-clock');
+    const periodDisplay = document.getElementById('current-period');
+    const datePill = document.getElementById('date-pill');
+    
+    const bangkokClock = new Intl.DateTimeFormat('en-GB', {
+      timeZone:'Asia/Bangkok', year:'numeric', month:'2-digit', day:'2-digit',
+      hour:'2-digit', minute:'2-digit', second:'2-digit', hourCycle:'h23'
+    });
+    
+    let saving = false;
+
+    function localTime(date) {
+      const parts = Object.fromEntries(bangkokClock.formatToParts(date)
+        .filter(p => p.type !== 'literal').map(p => [p.type, Number(p.value)]));
+      return parts;
+    }
+
+    function getAttendance(date) {
+      const t = localTime(date);
+      // อนุญาตให้ลงชื่อได้ทุกวัน (เอาเงื่อนไขวันที่ 7 ต.ค. 2026 ออก)
+      const validDay = true; 
+      const morning = t.hour < 12;
+      const minutes = t.hour * 60 + t.minute;
+      return {
+        ...t, validDay,
+        period: morning ? 'เช้า' : 'เย็น',
+        status: minutes <= (morning ? 8 * 60 + 30 : 15 * 60 + 30) ? 'ตรงเวลา' : 'สาย'
+      };
+    }
+
+    function showFeedback(message, kind) {
+      feedback.textContent = message;
+      feedback.style.display = 'block';
+      feedback.className = 'notice mt-5 rounded-xl px-4 py-3 leading-relaxed ' +
+        (kind === 'success' ? 'bg-[#e8f4eb] text-[#215839]' :
+         kind === 'error' ? 'bg-[#fff0e9] text-[#893f2b]' : 'bg-[#eaf0f4] text-[#28465f]');
+    }
+
+    function updateClock() {
+      const t = getAttendance(new Date());
+      clock.textContent = `${String(t.hour).padStart(2,'0')}:${String(t.minute).padStart(2,'0')}:${String(t.second).padStart(2,'0')} น.`;
+      
+      const thaiMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+      datePill.textContent = `${t.day} ${thaiMonths[t.month - 1]} ${t.year + 543}`;
+
+      periodDisplay.textContent = `ช่วง${t.period} · ขณะนี้${t.status}`;
+      submitButton.disabled = saving;
+    }
+
+    function setSaving(value) {
+      saving = value;
+      readyText.classList.toggle('hidden', value);
+      loadingText.classList.toggle('hidden', !value);
+      updateClock();
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (saving) return;
+      
+      const fullName = nameInput.value.trim().replace(/\s+/g, ' ');
+      if (!fullName) {
+        showFeedback('กรุณากรอกชื่อ–นามสกุลก่อนลงชื่อ', 'error');
+        nameInput.focus();
+        return;
+      }
+      
+      const learningGroup = groupSelect.value;
+      if (!learningGroup) {
+        showFeedback('กรุณาเลือกกลุ่มสาระการเรียนรู้หรือประเภทบุคลากร', 'error');
+        groupSelect.focus();
+        return;
+      }
+
+      if(GOOGLE_SCRIPT_URL.includes('ใส่_URL')) {
+        showFeedback('นักพัฒนา: กรุณาใส่ URL ของ Google Apps Script ในโค้ดก่อนใช้งาน', 'error');
+        return;
+      }
+
+      const submittedAt = new Date();
+      const attendance = getAttendance(submittedAt);
+
+      setSaving(true);
+      showFeedback('กำลังบันทึกการลงชื่อ…', 'info');
+      
+      try {
+        // ส่งข้อมูลไปยัง Google Apps Script
+        const response = await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          // ใช้ text/plain เพื่อป้องกันปัญหา CORS บนบราวเซอร์
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            full_name: fullName,
+            attendance_period: attendance.period,
+            status: attendance.status,
+            learning_group: learningGroup
+          })
+        });
+
+        const result = await response.json();
+        
+        if (result.result !== 'success') throw new Error('save failed');
+        
+        form.reset();
+        showFeedback(`บันทึกการลงชื่อสำเร็จ — ช่วง${attendance.period} เวลา ${String(attendance.hour).padStart(2,'0')}:${String(attendance.minute).padStart(2,'0')} น. สถานะ: ${attendance.status}`, 'success');
+        
+      } catch (error) {
+        showFeedback('บันทึกไม่สำเร็จ กรุณาลองอีกครั้ง (โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ต)', 'error');
+        console.error(error);
+      } finally {
+        setSaving(false);
+      }
+    });
+
+    updateClock();
+    setInterval(updateClock, 1000);
+  </script>
+ </body>
+</html>
