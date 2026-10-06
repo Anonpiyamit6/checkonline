@@ -72,10 +72,9 @@
  </head>
  <body class="pastel-bg min-h-screen text-slate-800 flex flex-col justify-between selection:bg-emerald-200">
 
-  <!-- Header: ออกแบบใหม่ จัดวางสมส่วนทั้งบนมือถือและคอม -->
+  <!-- Header -->
   <header class="w-full max-w-xl mx-auto px-4 pt-5 pb-2">
     <div class="flex items-center justify-between gap-2">
-      <!-- โลโก้และชื่อระบบ -->
       <div class="flex items-center gap-2.5 sm:gap-3.5">
         <div class="relative flex-shrink-0">
           <div class="w-12 h-12 sm:w-14 sm:h-14 bg-white rounded-2xl p-1.5 shadow-sm flex items-center justify-center border border-emerald-100">
@@ -91,7 +90,6 @@
         </div>
       </div>
 
-      <!-- ปุ่มแอดมินแบบมินิมอล ไม่กินพื้นที่หน้าจอมือถือ -->
       <button onclick="openAdminLogin()" 
               class="flex-shrink-0 inline-flex items-center gap-1.5 bg-white/90 hover:bg-white text-slate-700 hover:text-emerald-700 px-3 py-2 rounded-xl border border-slate-200 shadow-sm transition text-xs font-medium">
         <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
@@ -104,7 +102,6 @@
   <main class="w-full max-w-xl mx-auto px-4 py-2">
     <div class="bg-white/90 backdrop-blur-xl border border-white/80 rounded-3xl p-5 sm:p-8 shadow-xl shadow-emerald-950/5 relative overflow-hidden">
       
-      <!-- หัวข้อการ์ดและวันที่ -->
       <div class="flex items-center justify-between gap-2 mb-4">
         <div>
           <span class="text-[11px] font-semibold text-emerald-700 tracking-wider uppercase">Online Attendance</span>
@@ -140,7 +137,6 @@
         <div>
           <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">ข้อมูลผู้ลงชื่อ</label>
           <div class="space-y-2">
-            <!-- คำนำหน้า (Dropdown) -->
             <select id="prefix" name="prefix" required
                     class="w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm text-slate-800 focus:bg-white focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none transition cursor-pointer">
               <option value="" disabled selected>เลือกคำนำหน้า...</option>
@@ -150,7 +146,6 @@
               <option value="ว่าที่ร้อยตรี">ว่าที่ร้อยตรี</option>
             </select>
 
-            <!-- ช่องชื่อ และ นามสกุล อยู่แถวเดียวกันบนคอม และแบ่งช่องสวยงามบนมือถือ -->
             <div class="grid grid-cols-2 gap-2">
               <input id="first-name" name="first_name" type="text" autocomplete="given-name" required maxlength="60" 
                      placeholder="ชื่อจริง" 
@@ -208,7 +203,7 @@
     © โรงเรียนบางสะพานวิทยา · ระบบลงชื่อปฏิบัติงานออนไลน์
   </footer>
 
-  <!-- Modal แดชบอร์ดแอดมิน -->
+  <!-- Modal แดชบอร์ดแอดมิน (แยกตามช่วงเวลา) -->
   <div id="admin-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4">
     <div class="bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-7 shadow-2xl relative border border-slate-100 max-h-[92vh] flex flex-col">
       <div class="flex items-center justify-between pb-3 border-b border-slate-100">
@@ -224,7 +219,20 @@
         <button onclick="closeAdminModal()" class="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-xs">✕</button>
       </div>
 
-      <div class="grid grid-cols-3 gap-2 my-3">
+      <!-- แถบสลับช่วงเวลา (เช้า / บ่าย) -->
+      <div class="flex rounded-xl bg-slate-100 p-1 my-3">
+        <button id="btn-tab-morning" onclick="switchPeriod('เช้า')" 
+                class="flex-1 py-1.5 text-xs font-semibold rounded-lg bg-white shadow-sm text-emerald-800 transition">
+          🌅 ลงชื่อช่วงเช้า
+        </button>
+        <button id="btn-tab-afternoon" onclick="switchPeriod('บ่าย')" 
+                class="flex-1 py-1.5 text-xs font-semibold rounded-lg text-slate-600 transition">
+          🌇 ลงชื่อช่วงบ่าย
+        </button>
+      </div>
+
+      <!-- สรุปตัวเลขตามช่วงเวลาที่เลือก -->
+      <div class="grid grid-cols-3 gap-2 mb-3">
         <div class="bg-emerald-50/70 border border-emerald-100 rounded-xl p-2.5 text-center">
           <span class="text-[11px] text-emerald-700 font-medium">ทั้งหมด</span>
           <p id="stat-total" class="text-lg sm:text-xl font-bold text-emerald-900">0</p>
@@ -239,7 +247,8 @@
         </div>
       </div>
 
-      <div class="flex-1 overflow-auto border border-slate-100 rounded-xl mb-3 max-h-52">
+      <!-- ตารางแสดงรายการล่าสุดของช่วงเวลานั้น -->
+      <div class="flex-1 overflow-auto border border-slate-100 rounded-xl mb-3 max-h-48">
         <table class="w-full text-left text-xs text-slate-600">
           <thead class="bg-slate-50 text-slate-700 font-semibold sticky top-0">
             <tr>
@@ -254,30 +263,41 @@
         </table>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
-        <button onclick="downloadExcelReport()" 
-                class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 px-3 rounded-xl shadow-sm flex items-center justify-center gap-1.5 text-xs">
-          📗 โหลด Excel (.xlsx)
-        </button>
-        <button onclick="printGovernmentPDF()" 
-                class="bg-rose-600 hover:bg-rose-700 text-white font-medium py-2.5 px-3 rounded-xl shadow-sm flex items-center justify-center gap-1.5 text-xs">
-          📕 พิมพ์ / บันทึก PDF
-        </button>
-        <a id="btn-open-sheet" href="#" target="_blank" 
-           class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2.5 px-3 rounded-xl flex items-center justify-center gap-1 text-center text-xs">
-          เปิด Sheet ↗
-        </a>
+      <!-- ปุ่มดำเนินการและดาวน์โหลดแยกตามช่วงเวลา -->
+      <div class="space-y-2 pt-1">
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="downloadCurrentExcel()" 
+                  class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 px-3 rounded-xl shadow-sm flex items-center justify-center gap-1.5 text-xs">
+            📗 โหลด Excel (<span id="txt-btn-period-excel">ช่วงเช้า</span>)
+          </button>
+          <button onclick="printGovernmentPDF()" 
+                  class="bg-rose-600 hover:bg-rose-700 text-white font-medium py-2.5 px-3 rounded-xl shadow-sm flex items-center justify-center gap-1.5 text-xs">
+            📕 พิมพ์ PDF (<span id="txt-btn-period-pdf">ช่วงเช้า</span>)
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="downloadCombinedExcel()" 
+                  class="bg-slate-700 hover:bg-slate-800 text-white font-medium py-2.5 px-3 rounded-xl shadow-sm flex items-center justify-center gap-1.5 text-xs">
+            📦 โหลด Excel รวม 2 ชีทในไฟล์เดียว
+          </button>
+          <a id="btn-open-sheet" href="#" target="_blank" 
+             class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2.5 px-3 rounded-xl flex items-center justify-center gap-1 text-center text-xs">
+            เปิด Google Sheets ↗
+          </a>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- แทมเพลตสำหรับพิมพ์ PDF แบบฟอร์มราชการ -->
+  <!-- แทมเพลตสำหรับพิมพ์ PDF แบบฟอร์มราชการ (A4) -->
   <div id="print-area" class="gov-page">
     <div style="text-align: center; margin-bottom: 20px;">
       <img src="https://s.imgz.io/2026/10/06/31ee5db68b3d5c54b65425b0af82e3e7348c032590932d02.png" 
            style="width: 60px; height: 60px; margin: 0 auto 6px auto; object-fit: contain;">
       <h2 style="font-size: 16pt; font-weight: bold; margin: 0;">รายงานสรุปการลงเวลาปฏิบัติราชการและปฏิบัติงาน</h2>
-      <h3 style="font-size: 14pt; font-weight: bold; margin: 3px 0;">โรงเรียนบางสะพานวิทยา อำเภอบางสะพาน จังหวัดประจวบคีรีขันธ์</h3>
+      <h3 id="pdf-period-title" style="font-size: 15pt; font-weight: bold; margin: 2px 0;">(ช่วงเช้า)</h3>
+      <h3 style="font-size: 14pt; font-weight: bold; margin: 2px 0;">โรงเรียนบางสะพานวิทยา อำเภอบางสะพาน จังหวัดประจวบคีรีขันธ์</h3>
       <p id="pdf-report-date" style="font-size: 13pt; margin: 4px 0;">ข้อมูล ณ วัน...</p>
     </div>
 
@@ -296,7 +316,7 @@
       </tbody>
       <tfoot>
         <tr style="font-weight: bold; background-color: #fafafa;">
-          <td colspan="4" style="text-align: right; padding-right: 12px;">รวมจำนวนผู้ลงชื่อปฏิบัติงานทั้งหมด</td>
+          <td colspan="4" style="text-align: right; padding-right: 12px;">รวมจำนวนผู้ลงชื่อทั้งหมด</td>
           <td id="pdf-summary-total" colspan="2" style="text-align: center;">0 คน</td>
         </tr>
       </tfoot>
@@ -333,7 +353,9 @@
     const fullDateDisplay = document.getElementById('full-date-display');
     
     let saving = false;
-    let fetchedAdminData = null;
+    let rawMorningData = [];
+    let rawAfternoonData = [];
+    let currentActivePeriod = 'เช้า'; // 'เช้า' หรือ 'บ่าย'
 
     const thaiDays = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
     const thaiFullMonths = [
@@ -390,6 +412,8 @@
       const seconds = date.getSeconds();
       const morning = hours < 12;
       const totalMinutes = hours * 60 + minutes;
+
+      // เกณฑ์: เช้า <= 08:30 ตรงเวลา / บ่าย <= 15:30 ตรงเวลา
       const isOntime = totalMinutes <= (morning ? (8 * 60 + 30) : (15 * 60 + 30));
 
       return {
@@ -398,7 +422,7 @@
         day: date.getDate(),
         month: thaiFullMonths[date.getMonth()],
         year: date.getFullYear() + 543,
-        period: morning ? 'เช้า' : 'เย็น',
+        period: morning ? 'เช้า' : 'บ่าย',
         status: isOntime ? 'ตรงเวลา' : 'สาย'
       };
     }
@@ -426,6 +450,7 @@
       updateClock();
     }
 
+    // บันทึกฟอร์ม
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       if (saving) return;
@@ -457,7 +482,7 @@
             prefix: prefix,
             first_name: firstName,
             last_name: lastName,
-            attendance_period: attendance.period,
+            attendance_period: attendance.period, // "เช้า" หรือ "บ่าย"
             status: attendance.status,
             learning_group: learningGroup
           })
@@ -474,7 +499,7 @@
               <div class="text-left text-sm text-slate-600 bg-emerald-50/70 p-4 rounded-2xl border border-emerald-100 mt-2 space-y-1">
                 <p><b>ชื่อ-นามสกุล:</b> ${fullNameDisplay}</p>
                 <p><b>กลุ่ม:</b> ${learningGroup}</p>
-                <p><b>เวลาที่บันทึก:</b> ${String(attendance.hours).padStart(2,'0')}:${String(attendance.minutes).padStart(2,'0')} น. (ช่วง${attendance.period})</p>
+                <p><b>ช่วงเวลา:</b> รอบ${attendance.period} (${String(attendance.hours).padStart(2,'0')}:${String(attendance.minutes).padStart(2,'0')} น.)</p>
                 <p><b>สถานะ:</b> <span class="font-bold ${attendance.status === 'ตรงเวลา' ? 'text-emerald-700' : 'text-amber-700'}">${attendance.status}</span></p>
               </div>
             `,
@@ -499,6 +524,7 @@
       }
     });
 
+    // เข้าสู่ระบบแอดมิน
     async function openAdminLogin() {
       const { value: password } = await Swal.fire({
         title: 'เข้าสู่ระบบผู้ดูแลระบบ',
@@ -514,7 +540,7 @@
       if (!password) return;
 
       Swal.fire({
-        title: 'กำลังโหลดข้อมูล...',
+        title: 'กำลังดึงข้อมูลทั้ง 2 ชีท...',
         allowOutsideClick: false,
         didOpen: () => { Swal.showLoading(); }
       });
@@ -525,9 +551,12 @@
 
         if (res.result === 'success') {
           Swal.close();
-          fetchedAdminData = res.data;
+          rawMorningData = res.morningData || [];
+          rawAfternoonData = res.afternoonData || [];
           document.getElementById('btn-open-sheet').href = res.sheetUrl;
-          renderAdminDashboard(res.data);
+
+          // เปิดแท็บรอบเช้าเป็นค่าเริ่มต้น
+          switchPeriod('เช้า');
           document.getElementById('admin-modal').classList.remove('hidden');
         } else {
           Swal.fire({
@@ -548,8 +577,34 @@
       }
     }
 
-    function renderAdminDashboard(data) {
-      const rows = data.slice(1);
+    // สลับแท็บช่วงเวลา (เช้า / บ่าย) ในแดชบอร์ด
+    function switchPeriod(period) {
+      currentActivePeriod = period;
+
+      const btnMorning = document.getElementById('btn-tab-morning');
+      const btnAfternoon = document.getElementById('btn-tab-afternoon');
+      const txtExcel = document.getElementById('txt-btn-period-excel');
+      const txtPdf = document.getElementById('txt-btn-period-pdf');
+
+      if (period === 'เช้า') {
+        btnMorning.className = "flex-1 py-1.5 text-xs font-semibold rounded-lg bg-white shadow-sm text-emerald-800 transition";
+        btnAfternoon.className = "flex-1 py-1.5 text-xs font-semibold rounded-lg text-slate-600 transition";
+        txtExcel.textContent = "ช่วงเช้า";
+        txtPdf.textContent = "ช่วงเช้า";
+      } else {
+        btnAfternoon.className = "flex-1 py-1.5 text-xs font-semibold rounded-lg bg-white shadow-sm text-emerald-800 transition";
+        btnMorning.className = "flex-1 py-1.5 text-xs font-semibold rounded-lg text-slate-600 transition";
+        txtExcel.textContent = "ช่วงบ่าย";
+        txtPdf.textContent = "ช่วงบ่าย";
+      }
+
+      renderCurrentPeriodTable();
+    }
+
+    function renderCurrentPeriodTable() {
+      const activeData = (currentActivePeriod === 'เช้า') ? rawMorningData : rawAfternoonData;
+      const rows = activeData.slice(1); // ตัด Header
+
       let ontime = 0;
       let late = 0;
 
@@ -584,27 +639,47 @@
       document.getElementById('admin-modal').classList.add('hidden');
     }
 
-    function downloadExcelReport() {
-      if (!fetchedAdminData || fetchedAdminData.length === 0) {
-        Swal.fire('ไม่มีข้อมูล', 'ยังไม่มีรายการลงชื่อ', 'info');
+    // 1. ดาวน์โหลด Excel เฉพาะช่วงเวลาที่เลือก
+    function downloadCurrentExcel() {
+      const activeData = (currentActivePeriod === 'เช้า') ? rawMorningData : rawAfternoonData;
+      if (!activeData || activeData.length <= 1) {
+        Swal.fire('ไม่มีข้อมูล', `ยังไม่มีรายการลงชื่อ${currentActivePeriod === 'เช้า' ? 'ช่วงเช้า' : 'ช่วงบ่าย'}`, 'info');
         return;
       }
-      const ws = XLSX.utils.aoa_to_sheet(fetchedAdminData);
+      const ws = XLSX.utils.aoa_to_sheet(activeData);
       const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "รายงานลงเวลา");
+      XLSX.utils.book_append_sheet(wb, ws, `ลงชื่อช่วง${currentActivePeriod}`);
       const dateStr = new Date().toISOString().slice(0, 10);
-      XLSX.writeFile(wb, `รายงานลงเวลา_บางสะพานวิทยา_${dateStr}.xlsx`);
+      XLSX.writeFile(wb, `รายงานลงเวลา_${currentActivePeriod}_บางสะพานวิทยา_${dateStr}.xlsx`);
     }
 
+    // 2. ดาวน์โหลด Excel รวม (มี 2 ชีทในไฟล์เดียว)
+    function downloadCombinedExcel() {
+      const wb = XLSX.utils.book_new();
+
+      const wsMorning = XLSX.utils.aoa_to_sheet(rawMorningData.length > 0 ? rawMorningData : [["ไม่มีข้อมูล"]]);
+      XLSX.utils.book_append_sheet(wb, wsMorning, "ลงชื่อช่วงเช้า");
+
+      const wsAfternoon = XLSX.utils.aoa_to_sheet(rawAfternoonData.length > 0 ? rawAfternoonData : [["ไม่มีข้อมูล"]]);
+      XLSX.utils.book_append_sheet(wb, wsAfternoon, "ลงชื่อช่วงบ่าย");
+
+      const dateStr = new Date().toISOString().slice(0, 10);
+      XLSX.writeFile(wb, `รายงานลงเวลา_รวมสองช่วง_บางสะพานวิทยา_${dateStr}.xlsx`);
+    }
+
+    // 3. พิมพ์ PDF ราชการแยกตามช่วงเวลา
     function printGovernmentPDF() {
-      if (!fetchedAdminData || fetchedAdminData.length <= 1) {
-        Swal.fire('ไม่มีข้อมูล', 'ยังไม่มีรายการลงชื่อสำหรับออกรายงาน PDF', 'info');
+      const activeData = (currentActivePeriod === 'เช้า') ? rawMorningData : rawAfternoonData;
+      if (!activeData || activeData.length <= 1) {
+        Swal.fire('ไม่มีข้อมูล', `ยังไม่มีรายการลงชื่อ${currentActivePeriod === 'เช้า' ? 'ช่วงเช้า' : 'ช่วงบ่าย'} สำหรับออกรายงาน`, 'info');
         return;
       }
 
-      const rows = fetchedAdminData.slice(1);
+      const rows = activeData.slice(1);
       const t = getAttendance(getBangkokDate());
-      document.getElementById('pdf-report-date').textContent = `ข้อมูล ณ วัน${t.dayOfWeek}ที่ ${t.day} ${t.month} พ.ศ. ${t.year}`;
+      
+      document.getElementById('pdf-period-title').textContent = `(รอบ${currentActivePeriod})`;
+      document.getElementById('pdf-report-date').textContent = `ข้อมูล ณ วัน${t.dayOfWeek}ที่ ${t.day} ${t.month} ${t.year}`;
 
       const pdfTbody = document.getElementById('pdf-table-body');
       pdfTbody.innerHTML = '';
