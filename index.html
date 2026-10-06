@@ -3,86 +3,163 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบลงชื่อออนไลน์ | กลุ่มงานบริหารงานบุคคล</title>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>ระบบลงชื่อออนไลน์ โรงเรียนบางสะพานวิทยา</title>
+  
+  <!-- ตราโรงเรียนบนแถบแท็บ (Favicon) -->
+  <link rel="icon" type="image/png" href="https://s.imgz.io/2026/10/06/31ee5db68b3d5c54b65425b0af82e3e7348c032590932d02.png">
+  
+  <!-- ฟอนต์ Prompt ให้ดูล้ำสมัยและโมเดิร์นกว่าเดิม -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS & SweetAlert2 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <style>
-    :root { --ink:#172b3d; --muted:#607080; --blue:#183e61; --cream:#f5f2eb; }
-    * { box-sizing:border-box; }
-    body { margin:0; font-family:'Sarabun',sans-serif; color:var(--ink); }
-    .app-shell { width:100%; min-height:100%; background:radial-gradient(circle at 92% 0%,#e4eaf0 0%,transparent 38%),#f5f2eb; }
-    .rule-card { border:1px solid #e2e7e9; }
-    .form-card { box-shadow:0 22px 65px rgba(23,43,61,.10); }
-    input:focus-visible,button:focus-visible { outline:3px solid #e4ac55; outline-offset:3px; }
-    button:disabled { opacity:.55; cursor:not-allowed; }
-    .notice:empty { display:none; }
-    @media (prefers-reduced-motion:no-preference) {
-      .rise { animation:rise .55s both; }
-      .rise-later { animation-delay:.12s; }
-      @keyframes rise { from {opacity:0;transform:translateY(12px)} to {opacity:1;transform:translateY(0)} }
+    body {
+      font-family: 'Prompt', sans-serif;
+    }
+    /* พื้นหลังกราเดียนท์พาสเทล ละมุนตา */
+    .pastel-bg {
+      background: linear-gradient(135deg, #eef9f1 0%, #fdfbf1 50%, #e9f6ef 100%);
+    }
+    /* แสงสะท้อนเรืองๆ ทันสมัย */
+    .glow-pastel-green {
+      box-shadow: 0 10px 30px -5px rgba(52, 211, 153, 0.2);
+    }
+    .glow-pastel-yellow {
+      box-shadow: 0 10px 30px -5px rgba(251, 191, 36, 0.2);
+    }
+    /* สไตล์ปรับแต่ง SweetAlert ให้เข้าธีม */
+    div:where(.swal2-container) .swal2-popup {
+      border-radius: 1.75rem !important;
+      font-family: 'Prompt', sans-serif !important;
+      padding: 2rem 1.5rem !important;
     }
   </style>
-  <script src="https://cdn.tailwindcss.com/3.4.17" type="text/javascript"></script>
  </head>
- <body class="app-shell">
-  <main class="w-full max-w-6xl mx-auto px-5 sm:px-8 py-8 sm:py-14">
-   <header class="rise mb-9 sm:mb-12">
-    <div class="flex items-center gap-3 mb-6"><span aria-hidden="true" class="w-11 h-11 rounded-xl bg-[#183e61] text-white grid place-items-center font-bold text-2xl">✓</span>
-     <p class="font-semibold tracking-wide">กลุ่มงานบริหารงานบุคคล</p>
-    </div>
-    <h1 class="font-bold leading-tight mb-3 text-3xl">ระบบลงชื่อปฏิบัติงานออนไลน์</h1>
-    <p class="max-w-2xl leading-relaxed text-[#607080]">กรุณากรอกข้อมูลให้ครบถ้วนเพื่อบันทึกเวลาปฏิบัติงานของท่าน ระบบจะทำการบันทึกเวลาตามเวลามาตรฐานประเทศไทย</p>
-   </header>
-   <div class="w-full max-w-2xl mx-auto">
-    <section class="rise rise-later form-card bg-white rounded-3xl p-6 sm:p-9" aria-labelledby="form-heading">
-     <div class="flex flex-wrap justify-between items-start gap-4 mb-7">
+ <body class="pastel-bg min-h-screen text-slate-800 flex flex-col justify-between selection:bg-emerald-200">
+
+  <!-- Header แถบด้านบน -->
+  <header class="w-full max-w-5xl mx-auto px-6 pt-8 pb-4">
+    <div class="flex items-center gap-4">
+      <div class="relative group">
+        <div class="absolute -inset-1 bg-gradient-to-r from-emerald-300 to-amber-200 rounded-2xl blur opacity-60 group-hover:opacity-100 transition duration-300"></div>
+        <div class="relative w-14 h-14 sm:w-16 sm:h-16 bg-white rounded-2xl p-2 shadow-sm flex items-center justify-center border border-emerald-100/80">
+          <img src="https://s.imgz.io/2026/10/06/31ee5db68b3d5c54b65425b0af82e3e7348c032590932d02.png" 
+               alt="ตราโรงเรียนบางสะพานวิทยา" 
+               class="w-full h-full object-contain">
+        </div>
+      </div>
       <div>
-       <p class="font-bold tracking-wide mb-1 text-[#607080]">แบบฟอร์มลงเวลา</p>
-       <h2 id="form-heading" class="font-bold text-xl">บันทึกเวลาปฏิบัติงาน</h2>
-      </div><span id="date-pill" class="rounded-full bg-[#eaf0f4] px-4 py-2 font-semibold text-sm"></span>
-     </div>
-     <div class="bg-[#183e61] rounded-2xl p-5 sm:p-6 mb-7">
-      <p class="mb-1 text-[#d9e6f0]">เวลาปัจจุบัน</p>
-      <p id="current-clock" class="font-bold text-white text-3xl sm:text-4xl tabular-nums" aria-live="off">--:--:--</p>
-      <p id="current-period" class="mt-2 text-[#d9e6f0] font-medium" aria-live="polite">กำลังตรวจสอบช่วงเวลา…</p>
-     </div>
-     <form id="attendance-form" novalidate>
-      <label for="full-name" class="block font-semibold mb-2">ชื่อ - นามสกุล</label> 
-      <input id="full-name" name="full_name" type="text" autocomplete="name" required maxlength="120" placeholder="เช่น นายสมชาย ใจดี" class="w-full rounded-xl border border-[#cbd5dc] bg-white px-4 py-3.5 mb-6 text-[#172b3d] placeholder:text-[#8996a1]">
+        <span class="inline-block bg-emerald-100 text-emerald-800 text-xs px-2.5 py-0.5 rounded-full font-medium mb-1">กลุ่มงานบริหารงานบุคคล</span>
+        <h1 class="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">ระบบลงชื่อออนไลน์ โรงเรียนบางสะพานวิทยา</h1>
+      </div>
+    </div>
+  </header>
+
+  <!-- เนื้อหาหลัก (ฟอร์ม) -->
+  <main class="w-full max-w-xl mx-auto px-5 py-4">
+    <!-- กล่องฟอร์มแบบ Glassmorphism -->
+    <div class="bg-white/85 backdrop-blur-xl border border-white/70 rounded-3xl p-6 sm:p-9 shadow-xl shadow-emerald-950/5 relative overflow-hidden">
       
-      <label for="learning-group" class="block font-semibold mb-2">กลุ่มสาระการเรียนรู้ / ประเภทบุคลากร</label> 
-      <select id="learning-group" name="learning_group" required class="w-full rounded-xl border border-[#cbd5dc] bg-white px-4 py-3.5 mb-6 text-[#172b3d]"> 
-        <option value="" disabled selected>เลือกกลุ่ม...</option> 
-        <option>ผู้บริหาร</option>
-        <option>การงานอาชีพ</option>
-        <option>คณิตศาสตร์</option>
-        <option>ภาษาไทย</option>
-        <option>วิทยาศาสตร์และเทคโนโลยี</option>
-        <option>ศิลปะ</option>
-        <option>สังคมศึกษา</option>
-        <option>ภาษาต่างประเทศ</option>
-        <option>สุขศึกษาและพลศึกษา</option>
-        <option>แนะแนว</option>
-        <option>เจ้าหน้าที่</option>
-        <option>พนักงานราชการ</option>
-        <option>นักศึกษาฝึกสอน</option>
-        <option>อื่น ๆ</option> 
-      </select> 
-      
-      <button id="submit-button" type="submit" class="w-full rounded-xl bg-[#183e61] text-white px-5 py-4 font-bold transition hover:bg-[#28577c]"> 
-        <span id="submit-ready">ยืนยันการลงชื่อ</span> 
-        <span id="submit-loading" class="hidden">กำลังบันทึก…</span> 
-      </button>
-     </form>
-     <p id="feedback" class="notice mt-5 rounded-xl px-4 py-3 leading-relaxed" role="status" aria-live="polite"></p>
-    </section>
-   </div>
+      <!-- แสงตกแต่งมุมบนขวา -->
+      <div class="absolute -top-16 -right-16 w-40 h-40 bg-gradient-to-bl from-amber-100/70 to-transparent rounded-full blur-2xl pointer-events-none"></div>
+
+      <!-- หัวข้อการ์ดและวันที่ -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 relative">
+        <div>
+          <span class="text-xs font-semibold text-emerald-700 tracking-wider uppercase">Online Attendance</span>
+          <h2 class="text-xl font-bold text-slate-800">บันทึกเวลาปฏิบัติงาน</h2>
+        </div>
+        <div class="inline-flex items-center gap-1.5 self-start sm:self-auto bg-amber-50/80 border border-amber-200/60 px-3.5 py-1.5 rounded-full text-xs font-medium text-amber-900 shadow-sm">
+          <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+          <span id="full-date-display">กำลังโหลดวันที่...</span>
+        </div>
+      </div>
+
+      <!-- กล่องนาฬิกา Real-time สีเขียวพาสเทลโมเดิร์น -->
+      <div class="bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 text-white rounded-2xl p-5 mb-7 shadow-lg shadow-emerald-700/20 relative overflow-hidden">
+        <div class="flex justify-between items-center relative z-10">
+          <div>
+            <p class="text-xs text-emerald-200 font-medium tracking-wide">เวลาปัจจุบันตามเวลาประเทศไทย</p>
+            <p id="current-clock" class="text-3xl sm:text-4xl font-extrabold tracking-tight tabular-nums mt-1 text-white">--:--:--</p>
+          </div>
+          <div class="text-right">
+            <span id="status-badge" class="inline-block bg-white/20 backdrop-blur-md border border-white/20 text-emerald-50 px-3 py-1 rounded-xl text-xs font-semibold">
+              กำลังตรวจสอบ...
+            </span>
+          </div>
+        </div>
+        <div class="mt-3 pt-3 border-t border-white/10 text-xs text-emerald-100 flex items-center justify-between">
+          <span id="current-period">ช่วงเวลา: --</span>
+          <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-300 animate-pulse"></span> ระบบทำงานปกติ</span>
+        </div>
+      </div>
+
+      <!-- ฟอร์มกรอกข้อมูล -->
+      <form id="attendance-form" novalidate class="space-y-5">
+        <div>
+          <label for="full-name" class="block text-sm font-semibold text-slate-700 mb-2">ชื่อ - นามสกุล</label>
+          <div class="relative">
+            <input id="full-name" name="full_name" type="text" autocomplete="name" required maxlength="120" 
+                   placeholder="เช่น นายสมชาย ใจดี" 
+                   class="w-full rounded-2xl border border-slate-200/90 bg-slate-50/50 px-4 py-3.5 text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none transition duration-200">
+          </div>
+        </div>
+
+        <div>
+          <label for="learning-group" class="block text-sm font-semibold text-slate-700 mb-2">กลุ่มสาระการเรียนรู้ / ประเภทบุคลากร</label>
+          <select id="learning-group" name="learning_group" required 
+                  class="w-full rounded-2xl border border-slate-200/90 bg-slate-50/50 px-4 py-3.5 text-slate-800 focus:bg-white focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none transition duration-200 cursor-pointer">
+            <option value="" disabled selected>เลือกกลุ่มสาระ / ประเภท...</option>
+            <option>ผู้บริหาร</option>
+            <option>การงานอาชีพ</option>
+            <option>คณิตศาสตร์</option>
+            <option>ภาษาไทย</option>
+            <option>วิทยาศาสตร์และเทคโนโลยี</option>
+            <option>ศิลปะ</option>
+            <option>สังคมศึกษา</option>
+            <option>ภาษาต่างประเทศ</option>
+            <option>สุขศึกษาและพลศึกษา</option>
+            <option>แนะแนว</option>
+            <option>เจ้าหน้าที่</option>
+            <option>พนักงานราชการ</option>
+            <option>นักศึกษาฝึกสอน</option>
+            <option>อื่น ๆ</option>
+          </select>
+        </div>
+
+        <!-- ปุ่มกดยืนยันสีพาสเทลทันสมัย -->
+        <button id="submit-button" type="submit" 
+                class="w-full mt-3 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold py-4 px-6 shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/35 transform active:scale-[0.99] transition duration-200 flex justify-center items-center gap-2">
+          <span id="submit-ready" class="flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            ยืนยันการลงชื่อปฏิบัติงาน
+          </span>
+          <span id="submit-loading" class="hidden flex items-center gap-2">
+            <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+            </svg>
+            กำลังบันทึกข้อมูล...
+          </span>
+        </button>
+      </form>
+
+     </div>
   </main>
-  
+
+  <!-- Footer ลิขสิทธิ์ -->
+  <footer class="w-full text-center py-6 text-xs text-slate-500">
+    © โรงเรียนบางสะพานวิทยา · ระบบลงชื่อปฏิบัติงานออนไลน์
+  </footer>
+
   <script>
-    // ----------------------------------------------------
-    // นำ URL ที่ได้จาก Google Apps Script มาใส่ในช่องแปรด้านล่างนี้
+    // URL ของ Google Apps Script Web App
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbybkyLWApW9C6m8-W1Oj4_d9QWNhOqEU4mret-SiWpZAOX9hL8Gy4GKHAZxzDbhsaLtkw/exec';
-    // ----------------------------------------------------
 
     const form = document.getElementById('attendance-form');
     const nameInput = document.getElementById('full-name');
@@ -90,97 +167,119 @@
     const submitButton = document.getElementById('submit-button');
     const readyText = document.getElementById('submit-ready');
     const loadingText = document.getElementById('submit-loading');
-    const feedback = document.getElementById('feedback');
     const clock = document.getElementById('current-clock');
     const periodDisplay = document.getElementById('current-period');
-    const datePill = document.getElementById('date-pill');
-    
-    const bangkokClock = new Intl.DateTimeFormat('en-GB', {
-      timeZone:'Asia/Bangkok', year:'numeric', month:'2-digit', day:'2-digit',
-      hour:'2-digit', minute:'2-digit', second:'2-digit', hourCycle:'h23'
-    });
+    const statusBadge = document.getElementById('status-badge');
+    const fullDateDisplay = document.getElementById('full-date-display');
     
     let saving = false;
 
-    function localTime(date) {
-      const parts = Object.fromEntries(bangkokClock.formatToParts(date)
-        .filter(p => p.type !== 'literal').map(p => [p.type, Number(p.value)]));
-      return parts;
+    // รายชื่อวันและเดือนภาษาไทยแบบเต็ม
+    const thaiDays = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
+    const thaiFullMonths = [
+      'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+      'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+    ];
+
+    // ฟังก์ชันคำนวณและดึงเวลาประเทศไทย
+    function getBangkokDate() {
+      const now = new Date();
+      // แปลงเป็นเวลา Asia/Bangkok
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const bangkokTime = new Date(utc + (3600000 * 7));
+      return bangkokTime;
     }
 
     function getAttendance(date) {
-      const t = localTime(date);
-      // อนุญาตให้ลงชื่อได้ทุกวัน (เอาเงื่อนไขวันที่ 7 ต.ค. 2026 ออก)
-      const validDay = true; 
-      const morning = t.hour < 12;
-      const minutes = t.hour * 60 + t.minute;
+      const hours = date.getHours();
+      const minutes = date.getMinutes();
+      const seconds = date.getSeconds();
+      const morning = hours < 12;
+      const totalMinutes = hours * 60 + minutes;
+
+      // เกณฑ์: เช้า <= 08:30 ตรงเวลา / เย็น <= 15:30 ตรงเวลา
+      const isOntime = totalMinutes <= (morning ? (8 * 60 + 30) : (15 * 60 + 30));
+
       return {
-        ...t, validDay,
+        hours, minutes, seconds,
+        dayOfWeek: thaiDays[date.getDay()],
+        day: date.getDate(),
+        month: thaiFullMonths[date.getMonth()],
+        year: date.getFullYear() + 543,
         period: morning ? 'เช้า' : 'เย็น',
-        status: minutes <= (morning ? 8 * 60 + 30 : 15 * 60 + 30) ? 'ตรงเวลา' : 'สาย'
+        status: isOntime ? 'ตรงเวลา' : 'สาย'
       };
     }
 
-    function showFeedback(message, kind) {
-      feedback.textContent = message;
-      feedback.style.display = 'block';
-      feedback.className = 'notice mt-5 rounded-xl px-4 py-3 leading-relaxed ' +
-        (kind === 'success' ? 'bg-[#e8f4eb] text-[#215839]' :
-         kind === 'error' ? 'bg-[#fff0e9] text-[#893f2b]' : 'bg-[#eaf0f4] text-[#28465f]');
-    }
-
+    // อัปเดตนาฬิกาและวันที่แบบเต็ม
     function updateClock() {
-      const t = getAttendance(new Date());
-      clock.textContent = `${String(t.hour).padStart(2,'0')}:${String(t.minute).padStart(2,'0')}:${String(t.second).padStart(2,'0')} น.`;
+      const t = getAttendance(getBangkokDate());
       
-      const thaiMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
-      datePill.textContent = `${t.day} ${thaiMonths[t.month - 1]} ${t.year + 543}`;
+      // แสดงวันที่เต็ม เช่น วันพฤหัสบดีที่ 6 ตุลาคม พ.ศ. 2569
+      fullDateDisplay.textContent = `วัน${t.dayOfWeek}ที่ ${t.day} ${t.month} พ.ศ. ${t.year}`;
+      
+      // แสดงนาฬิกา
+      clock.textContent = `${String(t.hours).padStart(2,'0')}:${String(t.minutes).padStart(2,'0')}:${String(t.seconds).padStart(2,'0')} น.`;
+      periodDisplay.textContent = `ช่วงเวลา: รอบ${t.period}`;
 
-      periodDisplay.textContent = `ช่วง${t.period} · ขณะนี้${t.status}`;
+      // ป้ายสถานะปัจจุบัน (ตรงเวลา / สาย)
+      if (t.status === 'ตรงเวลา') {
+        statusBadge.textContent = '● ปกติ (ตรงเวลา)';
+        statusBadge.className = 'inline-block bg-emerald-400/25 border border-emerald-300 text-white px-3 py-1 rounded-xl text-xs font-medium';
+      } else {
+        statusBadge.textContent = '● เกินเวลา (สาย)';
+        statusBadge.className = 'inline-block bg-amber-400/25 border border-amber-300 text-amber-100 px-3 py-1 rounded-xl text-xs font-medium';
+      }
+
       submitButton.disabled = saving;
     }
 
-    function setSaving(value) {
-      saving = value;
-      readyText.classList.toggle('hidden', value);
-      loadingText.classList.toggle('hidden', !value);
+    function setSaving(state) {
+      saving = state;
+      readyText.classList.toggle('hidden', state);
+      loadingText.classList.toggle('hidden', !state);
       updateClock();
     }
 
+    // จัดการเมื่อกดปุ่มบันทึก
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       if (saving) return;
-      
+
       const fullName = nameInput.value.trim().replace(/\s+/g, ' ');
+      const learningGroup = groupSelect.value;
+
+      // ตรวจสอบความถูกต้องของข้อมูล (Validation) พร้อม Popup สวยๆ
       if (!fullName) {
-        showFeedback('กรุณากรอกชื่อ–นามสกุลก่อนลงชื่อ', 'error');
+        Swal.fire({
+          icon: 'warning',
+          title: 'กรุณากรอกข้อมูล',
+          text: 'โปรดระบุ ชื่อ - นามสกุล ให้ครบถ้วน',
+          confirmButtonColor: '#10b981',
+          confirmButtonText: 'ตกลง'
+        });
         nameInput.focus();
         return;
       }
-      
-      const learningGroup = groupSelect.value;
+
       if (!learningGroup) {
-        showFeedback('กรุณาเลือกกลุ่มสาระการเรียนรู้หรือประเภทบุคลากร', 'error');
+        Swal.fire({
+          icon: 'warning',
+          title: 'กรุณาเลือกกลุ่มสาระ',
+          text: 'โปรดระบุกลุ่มสาระการเรียนรู้หรือประเภทบุคลากร',
+          confirmButtonColor: '#10b981',
+          confirmButtonText: 'ตกลง'
+        });
         groupSelect.focus();
         return;
       }
 
-      if(GOOGLE_SCRIPT_URL.includes('ใส่_URL')) {
-        showFeedback('นักพัฒนา: กรุณาใส่ URL ของ Google Apps Script ในโค้ดก่อนใช้งาน', 'error');
-        return;
-      }
-
-      const submittedAt = new Date();
-      const attendance = getAttendance(submittedAt);
-
+      const attendance = getAttendance(getBangkokDate());
       setSaving(true);
-      showFeedback('กำลังบันทึกการลงชื่อ…', 'info');
-      
+
       try {
-        // ส่งข้อมูลไปยัง Google Apps Script
         const response = await fetch(GOOGLE_SCRIPT_URL, {
           method: 'POST',
-          // ใช้ text/plain เพื่อป้องกันปัญหา CORS บนบราวเซอร์
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
             full_name: fullName,
@@ -191,20 +290,44 @@
         });
 
         const result = await response.json();
-        
-        if (result.result !== 'success') throw new Error('save failed');
-        
-        form.reset();
-        showFeedback(`บันทึกการลงชื่อสำเร็จ — ช่วง${attendance.period} เวลา ${String(attendance.hour).padStart(2,'0')}:${String(attendance.minute).padStart(2,'0')} น. สถานะ: ${attendance.status}`, 'success');
-        
+
+        if (result.result === 'success') {
+          // แจ้งเตือนสำเร็จด้วย SweetAlert2 โทนสีสวยงาม
+          Swal.fire({
+            icon: 'success',
+            title: 'บันทึกสำเร็จ!',
+            html: `
+              <div class="text-left text-sm text-slate-600 bg-emerald-50/70 p-4 rounded-2xl border border-emerald-100 mt-2 space-y-1">
+                <p><b>ชื่อ-นามสกุล:</b> ${fullName}</p>
+                <p><b>กลุ่ม:</b> ${learningGroup}</p>
+                <p><b>เวลาที่บันทึก:</b> ${String(attendance.hours).padStart(2,'0')}:${String(attendance.minutes).padStart(2,'0')} น. (ช่วง${attendance.period})</p>
+                <p><b>สถานะ:</b> <span class="font-bold ${attendance.status === 'ตรงเวลา' ? 'text-emerald-700' : 'text-amber-700'}">${attendance.status}</span></p>
+              </div>
+            `,
+            confirmButtonColor: '#10b981',
+            confirmButtonText: 'เสร็จสิ้น'
+          });
+
+          form.reset();
+        } else {
+          throw new Error(result.error || 'Server error');
+        }
+
       } catch (error) {
-        showFeedback('บันทึกไม่สำเร็จ กรุณาลองอีกครั้ง (โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ต)', 'error');
         console.error(error);
+        Swal.fire({
+          icon: 'error',
+          title: 'เกิดข้อผิดพลาด!',
+          text: 'ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง หรือตรวจสอบสัญญาณอินเทอร์เน็ต',
+          confirmButtonColor: '#ef4444',
+          confirmButtonText: 'ปิด'
+        });
       } finally {
         setSaving(false);
       }
     });
 
+    // เริ่มการทำงานของนาฬิกา
     updateClock();
     setInterval(updateClock, 1000);
   </script>
