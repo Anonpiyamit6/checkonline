@@ -7,12 +7,10 @@
   
   <link rel="icon" type="image/png" href="https://s.imgz.io/2026/10/06/31ee5db68b3d5c54b65425b0af82e3e7348c032590932d02.png">
   
-  <!-- โหลดฟอนต์ Prompt (หน้าเว็บ) และ Sarabun / TH Sarabun (สำหรับเอกสารราชการ PDF) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- ไลบรารี Tailwind, SweetAlert2, SheetJS (Excel), และ html2pdf (PDF ราชการ) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -21,16 +19,45 @@
   <style>
     body { font-family: 'Prompt', sans-serif; }
     .pastel-bg { background: linear-gradient(135deg, #eef9f1 0%, #fdfbf1 50%, #e9f6ef 100%); }
-    
-    /* สไตล์ฟอนต์ราชการสำหรับ PDF */
-    .gov-report {
-      font-family: 'Sarabun', 'TH Sarabun PSK', sans-serif;
+
+    /* สไตล์แบบฟอร์มราชการ (TH Sarabun) */
+    .gov-page {
+      font-family: 'Sarabun', 'TH Sarabun PSK', sans-serif !important;
       color: #000;
-      line-height: 1.35;
+      line-height: 1.5;
+      background: #fff;
+    }
+    .gov-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed; /* ล็อคขนาดคอลัมน์ไม่ให้เบียดกัน */
     }
     .gov-table th, .gov-table td {
-      border: 1px solid #333;
-      padding: 5px 6px;
+      border: 1px solid #000;
+      padding: 6px 4px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    /* ซ่อนส่วนพิมพ์เมื่ออยู่บนหน้าเว็บปกติ */
+    @media screen {
+      #print-area { display: none; }
+    }
+    /* ตั้งค่าหน้ากระดาษ A4 เมื่อสั่งพิมพ์ */
+    @media print {
+      body * { visibility: hidden; }
+      #print-area, #print-area * { visibility: visible; }
+      #print-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        display: block !important;
+      }
+      @page {
+        size: A4 portrait;
+        margin: 12mm 10mm;
+      }
     }
   </style>
  </head>
@@ -219,21 +246,19 @@
         </table>
       </div>
 
-      <!-- ปุ่มดาวน์โหลด (Excel, PDF ราชการ, ลิงก์ Sheet) -->
+      <!-- ปุ่มดำเนินการต่าง ๆ -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-2">
-        <!-- ปุ่ม Excel (.xlsx) -->
         <button onclick="downloadExcelReport()" 
                 class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-3 rounded-xl shadow-sm flex items-center justify-center gap-1.5 text-xs sm:text-sm">
           📗 โหลด Excel (.xlsx)
         </button>
 
-        <!-- ปุ่ม PDF ราชการ (Sarabun) -->
-        <button onclick="downloadPDFReport()" 
+        <!-- พิมพ์ / บันทึก PDF (แบบคมชัดมาตรฐานราชการ) -->
+        <button onclick="printGovernmentPDF()" 
                 class="bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 px-3 rounded-xl shadow-sm flex items-center justify-center gap-1.5 text-xs sm:text-sm">
-          📕 โหลด PDF (แบบราชการ)
+          📕 พิมพ์ / บันทึก PDF
         </button>
 
-        <!-- ลิงก์เปิด Google Sheets -->
         <a id="btn-open-sheet" href="#" target="_blank" 
            class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-3 px-3 rounded-xl flex items-center justify-center gap-1 text-center text-xs sm:text-sm">
           เปิด Sheet ต้นทาง ↗
@@ -242,46 +267,41 @@
     </div>
   </div>
 
-  <!-- แทมเพลตซ่อนไว้สำหรับพิมพ์ PDF แบบฟอร์มราชการ (TH Sarabun) -->
-  <div class="hidden">
-    <div id="pdf-government-template" class="gov-report bg-white p-8 text-black" style="width: 794px; min-height: 1123px; font-size: 14pt;">
-      <!-- หัวเอกสารราชการ -->
-      <div class="text-center mb-6">
-        <img src="https://s.imgz.io/2026/10/06/31ee5db68b3d5c54b65425b0af82e3e7348c032590932d02.png" 
-             style="width: 70px; height: 70px; margin: 0 auto 8px auto; object-fit: contain;">
-        <h2 style="font-size: 18pt; font-weight: bold; margin: 0;">รายงานสรุปการลงเวลาปฏิบัติราชการและปฏิบัติงาน</h2>
-        <h3 style="font-size: 16pt; font-weight: bold; margin: 2px 0;">โรงเรียนบางสะพานวิทยา อำเภอบางสะพาน จังหวัดประจวบคีรีขันธ์</h3>
-        <p id="pdf-report-date" style="font-size: 14pt; margin: 4px 0;">ประจำวันที่ ...</p>
+  <!-- โครงสร้างสำหรับพิมพ์/ออกรายงาน PDF ตามระเบียบสารบรรณราชการ -->
+  <div id="print-area" class="gov-page p-8 max-w-[210mm] mx-auto text-black">
+    <div class="text-center mb-5">
+      <img src="https://s.imgz.io/2026/10/06/31ee5db68b3d5c54b65425b0af82e3e7348c032590932d02.png" 
+           style="width: 65px; height: 65px; margin: 0 auto 6px auto; object-fit: contain;">
+      <h2 style="font-size: 16pt; font-weight: bold; margin: 0;">รายงานสรุปการลงเวลาปฏิบัติราชการและปฏิบัติงาน</h2>
+      <h3 style="font-size: 14pt; font-weight: bold; margin: 2px 0;">โรงเรียนบางสะพานวิทยา อำเภอบางสะพาน จังหวัดประจวบคีรีขันธ์</h3>
+      <p id="pdf-report-date" style="font-size: 13pt; margin: 4px 0;">ข้อมูล ณ วัน...</p>
+    </div>
+
+    <table class="gov-table text-left" style="font-size: 11pt;">
+      <thead>
+        <tr style="background-color: #f3f4f6; text-align: center; font-weight: bold;">
+          <th style="width: 7%; text-align: center;">ลำดับ</th>
+          <th style="width: 22%; text-align: center;">วันเวลาที่บันทึก</th>
+          <th style="width: 28%; text-align: left; padding-left: 8px;">ชื่อ - นามสกุล</th>
+          <th style="width: 23%; text-align: left; padding-left: 8px;">กลุ่มสาระ / ประเภท</th>
+          <th style="width: 10%; text-align: center;">ช่วงเวลา</th>
+          <th style="width: 10%; text-align: center;">สถานะ</th>
+        </tr>
+      </thead>
+      <tbody id="pdf-table-body">
+      </tbody>
+    </table>
+
+    <div style="margin-top: 40px; display: flex; justify-content: space-between; font-size: 12pt; page-break-inside: avoid;">
+      <div style="text-align: center; width: 45%;">
+        <p>ลงชื่อ........................................................ผู้รายงาน</p>
+        <p style="margin-top: 4px;">(........................................................)</p>
+        <p>เจ้าหน้าที่กลุ่มงานบริหารงานบุคคล</p>
       </div>
-
-      <!-- ตารางราชการ -->
-      <table class="gov-table w-full text-left" style="border-collapse: collapse; width: 100%; font-size: 13pt;">
-        <thead>
-          <tr style="background-color: #f2f2f2; text-align: center; font-weight: bold;">
-            <th style="width: 45px; text-align: center;">ลำดับ</th>
-            <th style="width: 135px; text-align: center;">วันเวลาที่บันทึก</th>
-            <th>ชื่อ - สกุล</th>
-            <th>กลุ่มสาระ / ประเภท</th>
-            <th style="width: 70px; text-align: center;">ช่วงเวลา</th>
-            <th style="width: 80px; text-align: center;">สถานะ</th>
-          </tr>
-        </thead>
-        <tbody id="pdf-table-body">
-        </tbody>
-      </table>
-
-      <!-- ส่วนลงนามท้ายรายงานตามระเบียบราชการ -->
-      <div style="margin-top: 45px; display: flex; justify-content: space-between; font-size: 14pt; page-break-inside: avoid;">
-        <div style="text-align: center; width: 45%;">
-          <p>ลงชื่อ........................................................ผู้รายงาน</p>
-          <p style="margin-top: 5px;">(........................................................)</p>
-          <p>เจ้าหน้าที่กลุ่มงานบริหารงานบุคคล</p>
-        </div>
-        <div style="text-align: center; width: 45%;">
-          <p>ลงชื่อ........................................................ผู้รับรอง</p>
-          <p style="margin-top: 5px;">(........................................................)</p>
-          <p>ผู้อำนวยการโรงเรียนบางสะพานวิทยา</p>
-        </div>
+      <div style="text-align: center; width: 45%;">
+        <p>ลงชื่อ........................................................ผู้รับรอง</p>
+        <p style="margin-top: 4px;">(........................................................)</p>
+        <p>ผู้อำนวยการโรงเรียนบางสะพานวิทยา</p>
       </div>
     </div>
   </div>
@@ -315,6 +335,51 @@
       const now = new Date();
       const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
       return new Date(utc + (3600000 * 7));
+    }
+
+    // จัดการแปลงวันเวลาให้เป็นรูปแบบไทยอ่านง่าย ไม่ล้นตาราง
+    function formatDateTime(val) {
+      if (!val) return '-';
+      const d = new Date(val);
+      if (isNaN(d.getTime())) {
+        return String(val); // ถ้าเป็นข้อความเดิมอยู่แล้ว
+      }
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear() + 543;
+      const hours = String(d.getHours()).padStart(2, '0');
+      const minutes = String(d.getMinutes()).padStart(2, '0');
+      return `${day}/${month}/${year} ${hours}:${minutes} น.`;
+    }
+
+    // ระบบแยกแถวข้อมูลแบบอัจฉริยะ (รองรับทั้งชีตแบบเก่า 5 คอลัมน์ และแบบใหม่ 7 คอลัมน์)
+    function parseRow(r) {
+      if (!r || r.length === 0) return null;
+
+      // ถ้าเป็นแบบใหม่ 7 คอลัมน์: [วันเวลา, คำนำหน้า, ชื่อ, นามสกุล, กลุ่ม, ช่วงเวลา, สถานะ]
+      if (r.length >= 7) {
+        const prefix = r[1] || '';
+        const fname = r[2] || '';
+        const lname = r[3] || '';
+        const space = (prefix === 'ว่าที่ร้อยตรี') ? ' ' : '';
+        return {
+          time: formatDateTime(r[0]),
+          fullName: `${prefix}${space}${fname} ${lname}`.trim(),
+          group: r[4] || '-',
+          period: r[5] || '-',
+          status: r[6] || '-'
+        };
+      } 
+      // ถ้าเป็นแบบเดิม 5 คอลัมน์: [วันเวลา, ชื่อเต็ม, กลุ่ม, ช่วงเวลา, สถานะ]
+      else {
+        return {
+          time: formatDateTime(r[0]),
+          fullName: r[1] || '-',
+          group: r[2] || '-',
+          period: r[3] || '-',
+          status: r[4] || '-'
+        };
+      }
     }
 
     function getAttendance(date) {
@@ -359,7 +424,7 @@
       updateClock();
     }
 
-    // ส่งข้อมูลลงชื่อเข้า Google Apps Script
+    // บันทึกฟอร์ม
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       if (saving) return;
@@ -486,34 +551,33 @@
     }
 
     function renderAdminDashboard(data) {
-      const rows = data.slice(1); // ตัด Header แถวแรกออก
-      const total = rows.length;
+      const rows = data.slice(1);
       let ontime = 0;
       let late = 0;
-
-      rows.forEach(r => {
-        // คอลัมน์ที่ 6 (index 6) คือ สถานะ (ตรงเวลา/สาย)
-        if (r[6] === 'ตรงเวลา') ontime++;
-        if (r[6] === 'สาย') late++;
-      });
-
-      document.getElementById('stat-total').textContent = total;
-      document.getElementById('stat-ontime').textContent = ontime;
-      document.getElementById('stat-late').textContent = late;
 
       const tbody = document.getElementById('admin-table-body');
       tbody.innerHTML = '';
       
-      const reversedRows = [...rows].reverse().slice(0, 20);
-      reversedRows.forEach(r => {
-        const fullName = `${r[1]}${r[2]} ${r[3]}`;
+      const parsedRows = rows.map(r => parseRow(r)).filter(Boolean);
+
+      parsedRows.forEach(item => {
+        if (item.status === 'ตรงเวลา') ontime++;
+        if (item.status === 'สาย') late++;
+      });
+
+      document.getElementById('stat-total').textContent = parsedRows.length;
+      document.getElementById('stat-ontime').textContent = ontime;
+      document.getElementById('stat-late').textContent = late;
+
+      // แสดง 20 แถวล่าสุด
+      [...parsedRows].reverse().slice(0, 20).forEach(item => {
         const tr = document.createElement('tr');
         tr.className = 'hover:bg-slate-50 transition';
         tr.innerHTML = `
-          <td class="p-2.5">${r[0]}</td>
-          <td class="p-2.5 font-medium text-slate-800">${fullName}</td>
-          <td class="p-2.5">${r[4]}</td>
-          <td class="p-2.5"><span class="px-2 py-0.5 rounded-full text-xs font-semibold ${r[6] === 'ตรงเวลา' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${r[6]}</span></td>
+          <td class="p-2.5 whitespace-nowrap">${item.time}</td>
+          <td class="p-2.5 font-medium text-slate-800">${item.fullName}</td>
+          <td class="p-2.5">${item.group}</td>
+          <td class="p-2.5"><span class="px-2 py-0.5 rounded-full text-xs font-semibold ${item.status === 'ตรงเวลา' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${item.status}</span></td>
         `;
         tbody.appendChild(tr);
       });
@@ -523,23 +587,21 @@
       document.getElementById('admin-modal').classList.add('hidden');
     }
 
-    // 1. ดาวน์โหลดเป็นไฟล์ Excel (.xlsx แท้)
+    // 1. ดาวน์โหลดไฟล์ Excel (.xlsx)
     function downloadExcelReport() {
       if (!fetchedAdminData || fetchedAdminData.length === 0) {
         Swal.fire('ไม่มีข้อมูล', 'ยังไม่มีรายการลงชื่อ', 'info');
         return;
       }
-
       const ws = XLSX.utils.aoa_to_sheet(fetchedAdminData);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "รายงานลงเวลา");
-
       const dateStr = new Date().toISOString().slice(0, 10);
       XLSX.writeFile(wb, `รายงานลงเวลา_บางสะพานวิทยา_${dateStr}.xlsx`);
     }
 
-    // 2. ดาวน์โหลดเป็น PDF (แบบฟอร์มราชการ TH Sarabun)
-    function downloadPDFReport() {
+    // 2. พิมพ์ / บันทึกเป็น PDF (แบบมาตรฐานราชการ คมชัด 100% ตัวอักษรไม่เบียด)
+    function printGovernmentPDF() {
       if (!fetchedAdminData || fetchedAdminData.length <= 1) {
         Swal.fire('ไม่มีข้อมูล', 'ยังไม่มีรายการลงชื่อสำหรับออกรายงาน PDF', 'info');
         return;
@@ -553,45 +615,24 @@
       pdfTbody.innerHTML = '';
 
       rows.forEach((r, idx) => {
-        const fullName = `${r[1]}${r[2]} ${r[3]}`;
+        const item = parseRow(r);
+        if (!item) return;
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td style="text-align: center;">${idx + 1}</td>
-          <td style="text-align: center;">${r[0]}</td>
-          <td>${fullName}</td>
-          <td>${r[4]}</td>
-          <td style="text-align: center;">${r[5]}</td>
-          <td style="text-align: center; font-weight: ${r[6] === 'สาย' ? 'bold' : 'normal'}; color: ${r[6] === 'สาย' ? '#b91c1c' : '#15803d'};">${r[6]}</td>
+          <td style="text-align: center;">${item.time}</td>
+          <td style="padding-left: 8px;">${item.fullName}</td>
+          <td style="padding-left: 8px;">${item.group}</td>
+          <td style="text-align: center;">${item.period}</td>
+          <td style="text-align: center; font-weight: ${item.status === 'สาย' ? 'bold' : 'normal'}; color: ${item.status === 'สาย' ? '#b91c1c' : '#15803d'};">${item.status}</td>
         `;
         pdfTbody.appendChild(tr);
       });
 
-      const element = document.getElementById('pdf-government-template');
-      element.parentElement.classList.remove('hidden'); // แสดงชั่วคราวเพื่อแปลง
-
-      Swal.fire({
-        title: 'กำลังสร้างไฟล์ PDF...',
-        text: 'กำลังจัดหน้าเอกสารราชการ Sarabun PSK',
-        allowOutsideClick: false,
-        didOpen: () => { Swal.showLoading(); }
-      });
-
-      const opt = {
-        margin: [10, 10, 10, 10],
-        filename: `รายงานลงเวลา_บางสะพานวิทยา_${new Date().toISOString().slice(0,10)}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-
-      html2pdf().set(opt).from(element).save().then(() => {
-        element.parentElement.classList.add('hidden');
-        Swal.close();
-      }).catch(err => {
-        console.error(err);
-        element.parentElement.classList.add('hidden');
-        Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
-      });
+      // สั่งเปิดหน้าพิมพ์ระบบของเบราว์เซอร์ ซึ่งผู้ใช้สามารถกด "บันทึกเป็น PDF" ได้ทันที
+      // ฟอนต์จะคมชัดแบบ Vector และสระภาษาไทยจะไม่ทับกันเด็ดขาด
+      window.print();
     }
 
     updateClock();
