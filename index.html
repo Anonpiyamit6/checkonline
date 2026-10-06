@@ -121,14 +121,15 @@
             <p id="current-clock" class="text-2xl sm:text-3xl font-extrabold tracking-tight tabular-nums mt-0.5 text-white">--:--:--</p>
           </div>
           <div class="text-right">
+            <!-- ป้ายสถานะแบบกลาง ไม่แสดงคำว่าสาย -->
             <span id="status-badge" class="inline-block bg-white/20 backdrop-blur-md border border-white/20 text-emerald-50 px-2.5 py-1 rounded-xl text-xs font-semibold">
-              กำลังตรวจสอบ...
+              ● เปิดรับการลงชื่อ
             </span>
           </div>
         </div>
         <div class="mt-2.5 pt-2.5 border-t border-white/10 text-[11px] text-emerald-100 flex items-center justify-between">
           <span id="current-period">ช่วงเวลา: --</span>
-          <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-amber-300 animate-pulse"></span> ระบบปกติ</span>
+          <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse"></span> ระบบปกติ</span>
         </div>
       </div>
 
@@ -413,8 +414,8 @@
       const morning = hours < 12;
       const totalMinutes = hours * 60 + minutes;
 
-      // เกณฑ์: เช้า <= 08:30 ตรงเวลา / บ่าย <= 15:30 ตรงเวลา
-      const isOntime = totalMinutes <= (morning ? (8 * 60 + 30) : (15 * 60 + 30));
+      // เกณฑ์ใหม่: เช้า <= 09:00 ตรงเวลา (เกิน 09:00 น. ถือว่าสาย) / บ่าย <= 15:30 ตรงเวลา
+      const isOntime = totalMinutes <= (morning ? (9 * 60 + 0) : (15 * 60 + 30));
 
       return {
         hours, minutes, seconds,
@@ -433,13 +434,10 @@
       clock.textContent = `${String(t.hours).padStart(2,'0')}:${String(t.minutes).padStart(2,'0')}:${String(t.seconds).padStart(2,'0')} น.`;
       periodDisplay.textContent = `ช่วงเวลา: รอบ${t.period}`;
 
-      if (t.status === 'ตรงเวลา') {
-        statusBadge.textContent = '● ปกติ (ตรงเวลา)';
-        statusBadge.className = 'inline-block bg-emerald-400/25 border border-emerald-300 text-white px-2.5 py-0.5 rounded-xl text-[11px] font-medium';
-      } else {
-        statusBadge.textContent = '● เกินเวลา (สาย)';
-        statusBadge.className = 'inline-block bg-amber-400/25 border border-amber-300 text-amber-100 px-2.5 py-0.5 rounded-xl text-[11px] font-medium';
-      }
+      // แสดงเป็นสถานะเปิดรับปกติ ไม่แสดงว่าสาย
+      statusBadge.textContent = '● เปิดรับการลงชื่อ';
+      statusBadge.className = 'inline-block bg-white/20 backdrop-blur-md border border-white/20 text-emerald-50 px-2.5 py-1 rounded-xl text-xs font-semibold';
+      
       submitButton.disabled = saving;
     }
 
@@ -483,7 +481,7 @@
             first_name: firstName,
             last_name: lastName,
             attendance_period: attendance.period, // "เช้า" หรือ "บ่าย"
-            status: attendance.status,
+            status: attendance.status, // ยังส่ง "ตรงเวลา" หรือ "สาย" ไปบันทึกใน Google Sheets ตามปกติ
             learning_group: learningGroup
           })
         });
@@ -492,6 +490,8 @@
 
         if (result.result === 'success') {
           const fullNameDisplay = (prefix === 'ว่าที่ร้อยตรี') ? `${prefix} ${firstName} ${lastName}` : `${prefix}${firstName} ${lastName}`;
+          
+          // ป๊อปอัปแจ้งเตือน: ตัดบรรทัดสถานะออก ไม่แสดงให้ผู้ใช้เห็น
           Swal.fire({
             icon: 'success',
             title: 'บันทึกสำเร็จ!',
@@ -500,7 +500,6 @@
                 <p><b>ชื่อ-นามสกุล:</b> ${fullNameDisplay}</p>
                 <p><b>กลุ่ม:</b> ${learningGroup}</p>
                 <p><b>ช่วงเวลา:</b> รอบ${attendance.period} (${String(attendance.hours).padStart(2,'0')}:${String(attendance.minutes).padStart(2,'0')} น.)</p>
-                <p><b>สถานะ:</b> <span class="font-bold ${attendance.status === 'ตรงเวลา' ? 'text-emerald-700' : 'text-amber-700'}">${attendance.status}</span></p>
               </div>
             `,
             confirmButtonColor: '#10b981',
@@ -648,7 +647,7 @@
       }
       const ws = XLSX.utils.aoa_to_sheet(activeData);
       const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, `ลงชื่อช่วง${currentActivePeriod}`);
+      XLSX.utils.book_append_sheet(wb, `ลงชื่อช่วง${currentActivePeriod}`);
       const dateStr = new Date().toISOString().slice(0, 10);
       XLSX.writeFile(wb, `รายงานลงเวลา_${currentActivePeriod}_บางสะพานวิทยา_${dateStr}.xlsx`);
     }
